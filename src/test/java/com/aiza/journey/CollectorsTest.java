@@ -29,14 +29,18 @@ public class CollectorsTest {
 		// Comparator<Employee> salaryComparator = (o1, o2)->o1.getMonthlySalary().compareTo(o2.getMonthlySalary());
 		// Comparator<Employee> salaryComparator = Comparator.comparing(Employee::getMonthlySalary);
 		Map<Department, Optional<Employee>> highestPaidByDept = employees.stream()
+				.peek(d -> System.out.println("Debug: " + d))
 				.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.maxBy(Comparator.comparing(Employee::getMonthlySalary))));
+		
 		highestPaidByDept.forEach((k, v) -> {
 			System.out.println(k + " employee name: " + v.get().getName() + " with salary: " + v.get().getMonthlySalary());
 		});
 		
 		// Partition students into passing and failing
 		Map<Boolean, List<Employee>> passingFailing = employees.stream()
+				.peek(d -> System.out.println("Debug: " + d))
 				.collect(Collectors.partitioningBy(s -> s.getProbationThreshold() >= PASS_THRESHOLD));
+		
 		passingFailing.forEach((k, v) -> {
 			if (k == true) {
 				v.stream().forEach(l -> {
