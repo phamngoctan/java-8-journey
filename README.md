@@ -1,0 +1,1 @@
+Project to play around with java 8, lambda expression
