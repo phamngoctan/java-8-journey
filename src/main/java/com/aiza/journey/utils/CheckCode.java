@@ -1,13 +1,9 @@
 package com.aiza.journey.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,10 +12,17 @@ public class CheckCode {
 	private static final String fileUrl = "src/main/resources/qst1.txt";
 
 	public static void main(String[] args) {
+		List<String> scenarioCodes2 = Arrays.asList("1000", "1061", "1212", "2000", "2005", "2030", "2035", "2050", "5000",
+				"5010", "5020", "5030", "5040", "5045", "5050", "9030", "9031", "9040", "9041", "5041", "9050", "9051", "9070", "9071");
+		checkScenario(2, scenarioCodes2);
+		
 		List<String> scenarioCodes3 = Arrays.asList("1000", "1010", "5000", "9020", "9021", "5020", "9022", "5030", "5040",
 				"9010", "5010", "9030", "9031", "9040", "9070", "9071");
 		checkScenario(3, scenarioCodes3);
 		
+		List<String> scenarioCodes4 = Arrays.asList("1000", "5000", "9010", "5010", "5020", "5030", "5050", "9020", "9021",
+				"9022", "9070", "9071");
+		checkScenario(4, scenarioCodes4);
 	}
 
 	private static void checkScenario(int scenario, List<String> codes) {
