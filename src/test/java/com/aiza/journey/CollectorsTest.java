@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CollectorsTest {
@@ -21,15 +22,11 @@ public class CollectorsTest {
 			System.out.println(highestPaid.get());
 		}
 
-		// Group employees by department
-		Map<Department, List<Employee>> byDept = employees.stream()
-				.collect(Collectors.groupingBy(Employee::getDepartment));
-
 		// Find highest-paid employee by department
 		// Comparator<Employee> salaryComparator = (o1, o2)->o1.getMonthlySalary().compareTo(o2.getMonthlySalary());
 		// Comparator<Employee> salaryComparator = Comparator.comparing(Employee::getMonthlySalary);
 		Map<Department, Optional<Employee>> highestPaidByDept = employees.stream()
-				.peek(d -> System.out.println("Debug: " + d))
+//				.peek(d -> System.out.println("Debug: " + d))
 				.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.maxBy(Comparator.comparing(Employee::getMonthlySalary))));
 		
 		highestPaidByDept.forEach((k, v) -> {
@@ -38,7 +35,7 @@ public class CollectorsTest {
 		
 		// Partition students into passing and failing
 		Map<Boolean, List<Employee>> passingFailing = employees.stream()
-				.peek(d -> System.out.println("Debug: " + d))
+//				.peek(d -> System.out.println("Debug: " + d))
 				.collect(Collectors.partitioningBy(s -> s.getProbationThreshold() >= PASS_THRESHOLD));
 		
 		passingFailing.forEach((k, v) -> {
@@ -52,6 +49,58 @@ public class CollectorsTest {
 				});
 			}
 		});
+		
+		// Counting number of passed probation employee 
+		Long numberEmployeePassedProbation = employees.stream()
+			.filter(e -> e.getProbationThreshold() >= PASS_THRESHOLD)
+			.collect(Collectors.counting());
+		System.out.println("Total passed employee: " + numberEmployeePassedProbation);
+		
+		// Total salary that company has to pay in one month
+		BigDecimal totalMonthlySalary = employees.stream()
+				.filter(e -> e != null)
+				.map(e -> e.getMonthlySalary())
+				.reduce(BigDecimal.ZERO, BigDecimal::add);
+		System.out.println("Total salary that company has to pay in one month: " + totalMonthlySalary);
+		
+		// Get highest paid salary first solution
+		BigDecimal maxPaidValueFirstSolution = employees.stream()
+			.filter(e -> e != null)
+			.max(Comparator.comparing(Employee::getMonthlySalary)).get().getMonthlySalary();
+		System.out.println("Highest paid salary: " + maxPaidValueFirstSolution);
+		
+		// Get highest paid salary first solution
+		BigDecimal maxPaidValueSecondSolution = employees.stream()
+			.filter(e -> e != null)
+			.map(e -> e.getMonthlySalary())
+			.max(Comparator.naturalOrder()).get();
+		System.out.println("Highest paid salary: " + maxPaidValueSecondSolution);
+		
+		// Group employees by department, the value is a List
+		Map<Department, List<Employee>> byDept = employees.stream()
+				.collect(Collectors.groupingBy(Employee::getDepartment));
+		byDept.forEach((k, v) -> {
+			v.stream().forEach(l -> {
+				System.out.println("Way 1: Department name: " + k.getDepartmentName() + " employee: " + l.getName());
+			});
+		});
+		
+		// Group employees by department, the value is a Set
+		Map<Department, Set<Employee>> byDeptWithSetEmployeeValue = employees.stream()
+				.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.toSet()));
+		byDeptWithSetEmployeeValue.forEach((k, v) -> {
+			v.stream().forEach(l -> {
+				System.out.println("Way 2: Department name: " + k.getDepartmentName() + " employee: " + l.getName());
+			});
+		});
+		
+		// Average passed score
+		Double averagePassedScore = employees.stream()
+				.filter(e -> e != null && e.getProbationThreshold() >= PASS_THRESHOLD)
+				.map(e -> e.getProbationThreshold())
+				.collect(Collectors.averagingInt(Integer::intValue));
+		System.out.println("Avarage passed score of company: " + averagePassedScore);
+		
 	}
 
 	private static List<Employee> prepareEmployee() {
