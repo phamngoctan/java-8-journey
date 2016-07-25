@@ -15,20 +15,17 @@ public class TariffChecking {
 
 	public static void main(String[] args) throws IOException {
 		TariffChecking checkTariff = new TariffChecking();
+		BigDecimal taxableIncome = new BigDecimal(113000);
 		String tariffCode = "B2+";
 		List<String> tariffCodeMatchedLineList = checkTariff.getCorrespondingListFromTariffCode(tariffCode);
-		List<TariffValue> taxableIncomeRange = checkTariff.decodeLineStrToTaxableIncome(tariffCodeMatchedLineList, null, null); //new BigDecimal(110000)
+		List<TariffValue> taxableIncomeRange = checkTariff.decodeLineStrToTaxableIncome(tariffCodeMatchedLineList, taxableIncome); //new BigDecimal(110000)
 		taxableIncomeRange.forEach(k -> {
 			System.out.println(k);
 		});
 		
-		BigDecimal taxableIncome = new BigDecimal(113000);
-		List<TariffValue> taxableIncomeRangeBiggerThanCurrentIncome = checkTariff.listBiggerThanCurrentTaxableIncome(taxableIncomeRange, taxableIncome);
-		taxableIncomeRange.removeAll(taxableIncomeRangeBiggerThanCurrentIncome);
-		
-		TariffValue nearestValue = taxableIncomeRange.stream()
+		TariffValue nearestOrEqualTariffValue = taxableIncomeRange.stream()
 			.max(Comparator.comparing(TariffValue::getTaxableIncome)).get();
-		System.out.println(nearestValue.getTaxableIncome() + " --> rate: " + nearestValue.getRate());
+		System.out.println(nearestOrEqualTariffValue.getTaxableIncome() + " --> rate: " + nearestOrEqualTariffValue.getRate());
 	}
 
 	public List<String> getCorrespondingListFromTariffCode(String tariffCodes) throws IOException {
@@ -39,7 +36,7 @@ public class TariffChecking {
 				.collect(Collectors.toList());
 	}
 	
-	public List<TariffValue> decodeLineStrToTaxableIncome(List<String> tariffCodeMatchedLineList, final BigDecimal limit, final BigDecimal offset) {
+	public List<TariffValue> decodeLineStrToTaxableIncome(List<String> tariffCodeMatchedLineList, final BigDecimal limit) {
 		return tariffCodeMatchedLineList.stream()
 				.map(str -> {
 					String taxableIncomeStrBeforeDot = str.substring(25, 31);
@@ -52,14 +49,7 @@ public class TariffChecking {
 				})
 				.filter(t -> {
 					if (limit != null) {
-						return t.getTaxableIncome().compareTo(limit) >= 0;
-					} else {
-						return true;
-					}
-				})
-				.filter(t -> {
-					if (offset != null) {
-						return t.getTaxableIncome().compareTo(limit.add(offset)) <= 0;
+						return t.getTaxableIncome().compareTo(limit) <= 0;
 					} else {
 						return true;
 					}
@@ -69,16 +59,4 @@ public class TariffChecking {
 				;
 	}
 	
-	private List<TariffValue> listBiggerThanCurrentTaxableIncome(List<TariffValue> listTaxableIncome, final BigDecimal taxableIncome) {
-		return listTaxableIncome.stream()
-				.filter(t -> {
-					if (taxableIncome != null) {
-						return t.getTaxableIncome().compareTo(taxableIncome) > 0;
-					} else {
-						return true;
-					}
-				})
-				.collect(Collectors.toList())
-				;
-	}
 }
