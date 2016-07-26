@@ -5,20 +5,26 @@ Concept inside the java.util.stream.Collectors:
 * PartitioningBy is a specialized case of groupingBy that accepts a Predicate instance and collects Stream elements into a Map instance that stores Boolean values as keys and collections as values. Under the “true” key, you can find a collection of elements matching the given Predicate and under the “false” key, you can find a collection of elements not matching the given Predicate.
 
 Simplest Form of Lambda expression
-* new SomeInterface() {  
+```java
+new SomeInterface() {  
  @Override  
      public SomeType someMethod(args) { body }  
  }
  To
  (args) -> { body }
+```
 
 Expression for Lambda body
 * In Lambda we can use expression instead of block
 * If method has a void return type, then automatically no value will be returned
 * Previous version
+```java
 	return (s1.charAt(s1.length()-1) - s2.charAt(s2.length()-1) );
+```
 * Lambda with expression for body
+```java
 	s1.charAt(s1.length()-1) - s2.charAt(s2.length()-1) ;
+```
 
 Java 8 inbuilt functional interface
 * Function<T, R> - take a T as input, return an R as ouput
@@ -39,9 +45,12 @@ Local Variables in Lambda Expressions
 * The lambda expression scope is the same as the enclosing scope
 * Final and effectively final (http://stackoverflow.com/questions/20938095/difference-between-final-and-effectively-final)
 * With explicit declaration
+```java
 	final int size = somevalue;
 	doSomething(someArg -> use(size));
-*Effectively final
+```
+* Effectively final:
+```java
 	int size = somevalue;
 	doSomething(someArg -> use(size));
-
+```
