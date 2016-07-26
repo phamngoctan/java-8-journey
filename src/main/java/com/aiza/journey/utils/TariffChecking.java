@@ -19,7 +19,7 @@ public class TariffChecking {
 		TariffChecking checkTariff = new TariffChecking();
 		
 		// Handle for 2013, canton ow
-		BigDecimal taxableIncome = new BigDecimal(14000);
+		BigDecimal taxableIncome = new BigDecimal(56450);
 		TariffValue nearestOrEqualTariffValue = checkTariff.getNearestOrEqualTariffValue("B2+", taxableIncome, FILE_URL_OF_OW_2013);
 		System.out.println("OW TaxableIncome to get rate: " + taxableIncome + " Nearest taxable value: "
 				+ nearestOrEqualTariffValue.getTaxableIncome() + " --> rate: " + nearestOrEqualTariffValue.getRate());
@@ -46,6 +46,10 @@ public class TariffChecking {
 	public TariffValue getNearestOrEqualTariffValue(String tariffCode, BigDecimal taxableIncome, String fileUrl) throws IOException {
 		List<String> tariffCodeMatchedLineList = getCorrespondingListFromTariffCode(tariffCode, fileUrl);
 		List<TariffValue> taxableIncomeRange = decodeLineStrToTaxableIncome(tariffCodeMatchedLineList, taxableIncome);
+		/*taxableIncomeRange.stream()
+			.forEach(k -> {
+				System.out.println(k);
+			});*/
 		TariffValue nearestOrEqualTariffValue = taxableIncomeRange.stream()
 			.max(Comparator.comparing(TariffValue::getTaxableIncome)).get();
 		return nearestOrEqualTariffValue;
@@ -53,7 +57,7 @@ public class TariffChecking {
 
 	public List<String> getCorrespondingListFromTariffCode(String tariffCode, String fileUrl) throws IOException {
 		return Files.lines(Paths.get(fileUrl))
-				.parallel() // for parallel processing
+//				.parallel() // for parallel processing
 				.filter(line -> line.length() > 2)
 				.filter(line -> line.toLowerCase().contains(tariffCode.toLowerCase()))
 				.collect(Collectors.toList());
@@ -62,11 +66,11 @@ public class TariffChecking {
 	public List<TariffValue> decodeLineStrToTaxableIncome(List<String> tariffCodeMatchedLineList, final BigDecimal limit) {
 		return tariffCodeMatchedLineList.stream()
 				.map(str -> {
-					String taxableIncomeStrBeforeDot = str.substring(25, 31);
-					String taxableIncomeStrAfterDot = str.substring(32, 33);
+					String taxableIncomeStrBeforeDot = str.substring(24, 31);
+					String taxableIncomeStrAfterDot = str.substring(31, 33);
 					BigDecimal taxableIncome = new BigDecimal(taxableIncomeStrBeforeDot + "." + taxableIncomeStrAfterDot);
-					String rateStrBeforeDot = str.substring(55, 57);
-					String rateStrAfterDot = str.substring(58, 59);
+					String rateStrBeforeDot = str.substring(54, 57);
+					String rateStrAfterDot = str.substring(57, 59);
 					BigDecimal rate = new BigDecimal(rateStrBeforeDot + "." + rateStrAfterDot);
 					return new TariffValue(taxableIncome, rate);
 				})
