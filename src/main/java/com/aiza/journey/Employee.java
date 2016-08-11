@@ -1,8 +1,12 @@
 package com.aiza.journey;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Employee {
+public class Employee implements Serializable {
+
+	private static final long serialVersionUID = 9034286252715072045L;
+	
 	private Long id;
 	private String name;
 	private Department department;

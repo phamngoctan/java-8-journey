@@ -36,9 +36,11 @@ public class SingleAbstractMethod {
 				.filter(k -> k != 0)
 				.reduce(0, (x,y) -> x+y)
 				;
+		
 	}
 	
 	Function<Integer, Integer, Integer> comp = (first, second) -> Integer.compare(first, second);
+	static IAddable testIAddable = (first, second) -> first + second;
 }
 
 interface Function<T, U, R> {

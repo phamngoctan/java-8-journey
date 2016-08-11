@@ -19,13 +19,13 @@ public class TariffChecking {
 		TariffChecking checkTariff = new TariffChecking();
 		
 		// Handle for 2013, canton ow
-		BigDecimal taxableIncome = new BigDecimal(56450);
+		BigDecimal taxableIncome = new BigDecimal(14000);
 		TariffValue nearestOrEqualTariffValue = checkTariff.getNearestOrEqualTariffValue("B2+", taxableIncome, FILE_URL_OF_OW_2013);
 		System.out.println("OW TaxableIncome to get rate: " + taxableIncome + " Nearest taxable value: "
 				+ nearestOrEqualTariffValue.getTaxableIncome() + " --> rate: " + nearestOrEqualTariffValue.getRate());
 		
 		// Hanlde for 2013, canton lu for tariff code: C0d
-		BigDecimal taxableIncomeLu = new BigDecimal(8200);
+		BigDecimal taxableIncomeLu = new BigDecimal(36000);
 		TariffValue nearestOrEqualTariffValue2 = checkTariff.getNearestOrEqualTariffValue("C0d", taxableIncomeLu, FILE_URL_OF_LU_2013);
 		System.out.println("LU TaxableIncome to get rate: " + taxableIncomeLu + " Nearest taxable value: "
 				+ nearestOrEqualTariffValue2.getTaxableIncome() + " --> rate: " + nearestOrEqualTariffValue2.getRate());
