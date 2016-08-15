@@ -1,4 +1,4 @@
-package com.aiza.journey.utils;
+package com.aiza.journey.payslip;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import com.aiza.journey.payslip.SalaryItemTypeName;
 
 public class ReadCalculationFile {
 
@@ -29,7 +27,7 @@ public class ReadCalculationFile {
 	private static final int PART_1_END_COL_3 = 94;
 	private static final int PART_1_START_COL_4 = 95;
 	private static final int PART_1_END_COL_4 = 108;
-	private static final int PART_1_START_COL_5 = 111;
+	private static final int PART_1_START_COL_5 = 110;
 	private static final int PART_1_END_COL_5 = 121;
 	private static final int PART_1_START_COL_6 = 122;
 	private static final int PART_1_END_COL_6 = 135;
@@ -120,8 +118,7 @@ public class ReadCalculationFile {
 			String marchHeader = fillTextWithSpace("03.2013", COL_4_LENGTH);
 			String aprToOctHeader = fillTextWithSpace("04.2013 - 10.2013", COL_5_LENGTH);
 			String novToDecHeader = fillTextWithSpace("11.2013 - 12.2013", COL_6_LENGTH);
-			System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", codeHeader, nameHeader, janToFebHeader,
-					marchHeader, aprToOctHeader, novToDecHeader);
+			printLog(codeHeader, janToFebHeader, marchHeader, aprToOctHeader, novToDecHeader, nameHeader);
 			ReadCalculationFile.readPartOne(employee.getBlock1(), shouldShowDuplicate);
 			ReadCalculationFile.readPartTwo(employee.getBlock2(), shouldShowDuplicate);
 		}
@@ -165,12 +162,11 @@ public class ReadCalculationFile {
 				if (!shouldShowDuplicate) {
 					if (!duration1.trim().isEmpty() || !duration2.trim().isEmpty() || !duration3.trim().isEmpty()
 							|| !duration4.trim().isEmpty()) {
-						System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", code, englishCodeName, duration1,
-								duration2, duration3, duration4);
+						printLog(code, duration1, duration2, duration3, duration4, englishCodeName);
+						handleAndPrintSpecialCase(code, duration1, duration2, duration3, duration4, englishCodeName);
 					}
 				} else {
-					System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", code, englishCodeName, duration1,
-							duration2, duration3, duration4);
+					printLog(code, duration1, duration2, duration3, duration4, englishCodeName);
 				}
 			}
 		}
@@ -216,19 +212,31 @@ public class ReadCalculationFile {
 				duration2 = formatText(duration2, COL_4_LENGTH);
 				duration3 = formatText(duration3, COL_5_LENGTH);
 				duration4 = formatText(duration4, COL_6_LENGTH);
-
+				
 				if (!shouldShowDuplicate) {
 					if (!duration1.trim().isEmpty() || !duration2.trim().isEmpty() || !duration3.trim().isEmpty()
 							|| !duration4.trim().isEmpty()) {
-						System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", code, englishCodeName, duration1,
-								duration2, duration3, duration4);
+						printLog(code, duration1, duration2, duration3, duration4, englishCodeName);
 					}
 				} else {
-					System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", code, englishCodeName, duration1,
-							duration2, duration3, duration4);
+					printLog(code, duration1, duration2, duration3, duration4, englishCodeName);
 				}
 			}
 		}
+	}
+
+	private static void handleAndPrintSpecialCase(String code, String duration1, String duration2, String duration3,
+			String duration4, String englishCodeName) {
+		if (code.contains("9010")) {
+			printLog(fillTextWithSpace(SalaryItemTypeName.ALV_BASE.getCode().toString(), COL_1_LENGTH),
+					duration1, duration2, duration3, duration4, fillTextWithSpace(SalaryItemTypeName.ALV_BASE.name(), COL_2_LENGTH));
+		}
+	}
+
+	private static void printLog(String code, String duration1, String duration2, String duration3, String duration4,
+			String englishCodeName) {
+		System.out.format("| %s | %s | %s | %s | %s | %s | \r\n", code, englishCodeName, duration1,
+				duration2, duration3, duration4);
 	}
 
 	private static String formatText(String text, int lengthToFill) {

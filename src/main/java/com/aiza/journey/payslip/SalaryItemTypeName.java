@@ -105,6 +105,22 @@ public enum SalaryItemTypeName {
 		this.germanName = german;
 		this.code = sitCode;
 	}
+	
+	public String getGermanName() {
+		return germanName;
+	}
+
+	public void setGermanName(String germanName) {
+		this.germanName = germanName;
+	}
+
+	public Integer getCode() {
+		return code;
+	}
+
+	public void setCode(Integer code) {
+		this.code = code;
+	}
 
 	public static String fromGermanName(String german) {
 		for (SalaryItemTypeName sitEnum : SalaryItemTypeName.values()) {
