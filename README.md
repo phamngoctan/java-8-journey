@@ -54,3 +54,28 @@ Local Variables in Lambda Expressions
 	int size = somevalue;
 	doSomething(someArg -> use(size));
 ```
+
+* Avoid NullPointerException
+```java
+if (contract != null && contract.getEmployee() != null
+   contract.getEmployee().getAddresses() != null
+     contract.getEmployee().getAddresses().isEmpty() == false
+        contract.getEmployee().getAddresses().get(0) != null
+            contract.getEmployee().getAddresses().get(0).getZipcode() != null) {
+
+    return contract.getEmployee().getAddresses().get(0).getZipcode();
+
+} else {
+    return getSomewhereElseTheZipCode();
+}
+```
+equals
+```java
+return Optional.ofNullable(contract)
+    .map(c -> c.getEmployee())
+    .map(e -> e.getAddresses())
+    .flatMap(e -> e.getAddresses().stream().findFirst())
+    .map(a -> a.getZipcode())
+    .orElseGet(getSomewhereElseTheZipCode());
+```
+Reference: http://www.oracle.com/technetwork/articles/java/java8-optional-2175753.html

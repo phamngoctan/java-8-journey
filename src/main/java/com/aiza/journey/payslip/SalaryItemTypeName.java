@@ -7,7 +7,7 @@ public enum SalaryItemTypeName {
 	NOT_FOUND(0, "Not found"),
 	MONTHLY_SALARY(1000, "Monatslohn"), 
 	HOURLY_SALARY(1005, "Stundenlohn"),
-	LESSONS_SALARY(1006, "Stundenlohn"),
+	LESSONS_SALARY(1006, "Lektionenlohn"),
 	FEES(1010,"Honorare"),
 	RESIDENCE_ALLOWANCE(1033,"Ortszulage"),
 	OVERTIME_HOURS_125_PERCENTAGE(1061,"Ueberstunden 125"),
