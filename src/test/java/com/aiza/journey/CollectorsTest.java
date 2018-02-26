@@ -2,6 +2,7 @@ package com.aiza.journey;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,12 @@ public class CollectorsTest {
 	private static final int PASS_THRESHOLD = 50;
 
 	public static void main(String[] args) {
+		// join
+		String creditorAddressLine = new ArrayList<>(Arrays.asList("hello, world".split(","))).stream().map(String::trim).collect(Collectors.joining(" "));
+		System.out.println(creditorAddressLine);
+		String testStr = String.join("-", "java", "is", "the", "best");
+		System.out.println(testStr);
+		
 		List<Employee> employees = prepareEmployee();
 		
 		// Find highest-paid employee
