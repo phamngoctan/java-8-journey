@@ -19,6 +19,8 @@ public class CollectorsTest {
 		System.out.println(creditorAddressLine);
 		String testStr = String.join("-", "java", "is", "the", "best");
 		System.out.println(testStr);
+		String testNullJoin = String.join(" ", null, "hello");
+		System.out.println(testNullJoin);
 		
 		List<Employee> employees = prepareEmployee();
 		
