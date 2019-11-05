@@ -33,7 +33,7 @@ Expression for Lambda body
 ```
 
 ## Java 8 inbuilt functional interface
-* Function<T, R> - take a T as input, return an R as ouput
+* Function<T, R> - take a T as input, return an R as output
 * Predicate<T> - take a T as input, return a boolean as output
 * Consumer<T> - take a T as input, perform some action and don't return anything
 * Supplier<T> - with nothing as input, return a T
