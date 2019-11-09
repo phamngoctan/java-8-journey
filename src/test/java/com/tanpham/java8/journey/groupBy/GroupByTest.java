@@ -5,6 +5,9 @@ import static org.junit.Assert.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
@@ -14,6 +17,7 @@ import org.junit.Test;
 import com.tanpham.java8.journey.model.BlogPost;
 import com.tanpham.java8.journey.model.BlogPostType;
 import com.tanpham.java8.journey.model.Tuple;
+import com.tanpham.java8.journey.model.TupleTypeStatistic;
 
 public class GroupByTest {
 
@@ -117,4 +121,35 @@ public class GroupByTest {
 		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).size(), Matchers.equalTo(4));
 	}
 	
+	@Test
+	public void handlingTheDownstream__changeTheReturnedListToSet() {
+		Map<String, Set<BlogPost>> result = blogPosts.stream().collect(Collectors.groupingBy(BlogPost::getAuthor, Collectors.toSet()));
+		assertThat(result.get("Saturn").size(), Matchers.equalTo(5));
+	}
+	
+	@Test
+	public void handlingTheDownstream__changeTheReturnedListOfBlogPost_reduceToAnObject() {
+		Map<Tuple, Optional<BlogPost>> result = blogPosts.stream()
+				.collect(Collectors.groupingBy(post -> new Tuple(post.getAuthor(), post.getType()), 
+										Collectors.collectingAndThen(Collectors.toList(), 
+											mergeListBlogPostsUsingReduce()
+							)));
+		System.out.println(result);
+		
+		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).isPresent(), Matchers.equalTo(true));
+		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).get().getAuthor(), Matchers.equalTo("Saturn"));
+		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).get().getLikes(), Matchers.equalTo(1140));
+		
+		// Prove that the first matched item will be kept for the whole reduce process
+		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).get().getId(), Matchers.equalTo(5L));
+	}
+
+	private Function<List<BlogPost>, Optional<BlogPost>> mergeListBlogPostsUsingReduce() {
+		return postByTuple -> {
+			return postByTuple.stream().reduce((BlogPost partial, BlogPost post) -> {
+					partial.setLikes(partial.getLikes() + post.getLikes());
+					return partial;
+				});
+		};
+	}
 }
