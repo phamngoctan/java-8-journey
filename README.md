@@ -90,6 +90,18 @@ return Optional.ofNullable(contract)
     .map(a -> a.getZipcode())
     .orElseGet(getSomewhereElseTheZipCode());
 ```
+## Playground
+### groupBy
+
+```java
+static <T,K,D,A,M extends Map<K,D>> Collector<T,?,M>
+  groupingBy(Function<? super T,? extends K> classifier, 
+    Supplier<M> mapFactory, Collector<? super T,A,D> downstream)
+```
+
+## Notes
+This project reflects personal idea of author. Feel free to feedback by create an issue or email me.
 
 ## Reference 
 - http://www.oracle.com/technetwork/articles/java/java8-optional-2175753.html
+- https://www.baeldung.com/java-groupingby-collector
