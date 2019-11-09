@@ -99,6 +99,9 @@ static <T,K,D,A,M extends Map<K,D>> Collector<T,?,M>
     Supplier<M> mapFactory, Collector<? super T,A,D> downstream)
 ```
 
+### reduce
+When it comes to reduce action, I figured out that <b>the first item would be the one represents for the final result (Checked by this test GroupByTest.handlingTheDownstream__changeTheReturnedListOfBlogPost_toListOfTupleType, the memory ref ID used the first item)</b> of the reduction. If there is no items in the stream, the Optional with empty value will be returned.
+
 ## Notes
 This project reflects personal idea of author. Feel free to feedback by create an issue or email me.
 
