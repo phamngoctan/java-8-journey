@@ -173,7 +173,6 @@ public class GroupByTest {
 		return posts -> {
 			return posts.stream().map(post -> {
 				return postToSinglePostStatistic(post);
-						
 			}).collect(Collectors.toList());
 		};
 	}
@@ -214,4 +213,41 @@ public class GroupByTest {
 		return typeStatistic;
 	}
 	
+	// If you enable the block of code with Collectors.reducing(new PostStatistic()
+	// This code will not work well as we expect. Somehow it uses the PostStatistic for all the groupingBy groups.
+	@Test
+	public void handlingTheDownstream__changeTheReturnedListOfBlogPost_mapToAnObject_usingMapping() {
+		Map<Object, Optional<PostStatistic>> result = blogPosts.stream()
+					.collect(Collectors.groupingBy(post -> new Tuple(post.getAuthor(), post.getType()), 
+//								Collectors.toList())
+								Collectors.mapping(
+										groupedPost -> {
+											PostStatistic sta = new PostStatistic();
+											sta.setTotalLikes(groupedPost.getLikes());
+											return sta;
+//											return groupedPost.getLikes();
+//											return postToSinglePostStatistic(post);
+//											return Integer.toString(post.getLikes());
+										},
+										Collectors.reducing((s1, s2) -> {
+											s1.setTotalLikes(s2.getTotalLikes() + s1.getTotalLikes());
+											return s1;
+										})
+//										Collectors.reducing(new PostStatistic(), (s1, s2) -> {
+//											s1.setTotalLikes(s2.getTotalLikes() + s1.getTotalLikes());
+//											return s1;
+//										})
+//										Collectors.reducing(0, (s1, s2) -> {
+//											return s1 + s2;
+//										})
+//										Collectors.joining(", ", " Likes: [", "]"))
+								)
+					));
+//					);
+		
+		Tuple saturnWithReviewTypeTuple = new Tuple("Saturn", BlogPostType.REVIEW);
+		assertThat(result.get(saturnWithReviewTypeTuple).isPresent(), Matchers.equalTo(true));
+		assertThat(result.get(saturnWithReviewTypeTuple).get().getTotalLikes(), Matchers.equalTo(1140));
+	}
+
 }
