@@ -35,8 +35,41 @@ public class IncreaseMapValueTest {
 	}
 	
 	@Test
-	public void computeIfAbsent_() {
+	public void computeIfAbsent_approach() {
+		Integer count = countByName.computeIfAbsent("Saturn", key -> 0);
+		countByName.put("Saturn", count + 1);
 		
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(1));
 	}
+	
+	@Test
+	public void computeIfPresent_approach() {
+		Integer computeIfPresent = countByName.computeIfPresent("Saturn", (k, v) -> v + 1);
+		if (computeIfPresent == null) {
+			countByName.put("Saturn", 1);
+		}
+		
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(1));
+		
+		countByName.computeIfPresent("Saturn", (k, v) -> v + 1);
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(2));
+	}
+	
+	@Test
+	public void compute__approach() {
+		countByName.compute("Saturn", (k, v) -> 1 + (v == null ? 0 : v));
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(1));
+		countByName.compute("Saturn", (k, v) -> 1 + (v == null ? 0 : v));
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(2));
+	}
+	
+	@Test
+	public void merge_approach() {
+		countByName.merge("Saturn", 1, (v1, v2) -> v1 + v2);
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(1));
+		countByName.merge("Saturn", 4, (v1, v2) -> v1 + v2);
+		assertThat(countByName.get("Saturn"), Matchers.equalTo(5));
+	}
+	
 	
 }
