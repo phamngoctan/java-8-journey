@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.tanpham.java8.journey.model.BlogPost;
 import com.tanpham.java8.journey.model.BlogPostType;
 import com.tanpham.java8.journey.model.Tuple;
-import com.tanpham.java8.journey.model.TupleTypeStatistic;
+import com.tanpham.java8.journey.model.PostStatistic;
 
 public class GroupByTest {
 
@@ -127,6 +127,8 @@ public class GroupByTest {
 		assertThat(result.get("Saturn").size(), Matchers.equalTo(5));
 	}
 	
+	// Reduce a list of object to the first met object of the list
+	// The like will be sum of all likes
 	@Test
 	public void handlingTheDownstream__changeTheReturnedListOfBlogPost_reduceToAnObject() {
 		Map<Tuple, Optional<BlogPost>> result = blogPosts.stream()
@@ -134,7 +136,6 @@ public class GroupByTest {
 										Collectors.collectingAndThen(Collectors.toList(), 
 											mergeListBlogPostsUsingReduce()
 							)));
-		System.out.println(result);
 		
 		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).isPresent(), Matchers.equalTo(true));
 		assertThat(result.get(new Tuple("Saturn", BlogPostType.REVIEW)).get().getAuthor(), Matchers.equalTo("Saturn"));
@@ -152,4 +153,65 @@ public class GroupByTest {
 				});
 		};
 	}
+
+	// Map list of objects to another list of other objects
+	@Test
+	public void handlingTheDownstream__changeTheReturnedListOfBlogPost_mapToListOfOtherObjects__prepareForTheLatterTest() {
+		Map<Tuple, List<PostStatistic>> result = blogPosts.stream()
+					.collect(Collectors.groupingBy(post -> new Tuple(post.getAuthor(), post.getType()), 
+								Collectors.collectingAndThen(Collectors.toList(), 
+									listBlogPostsToListPostStatistic())
+					));
+		
+		Tuple saturnWithReviewTypeTuple = new Tuple("Saturn", BlogPostType.REVIEW);
+		assertThat(result.get(saturnWithReviewTypeTuple), Matchers.notNullValue());
+		assertThat(result.get(saturnWithReviewTypeTuple).size(), Matchers.equalTo(4));
+		assertThat(result.get(saturnWithReviewTypeTuple).get(0).getAuthorStatistic().get("Saturn"), Matchers.equalTo(1));
+	}
+
+	private Function<List<BlogPost>, List<PostStatistic>> listBlogPostsToListPostStatistic() {
+		return posts -> {
+			return posts.stream().map(post -> {
+				return postToSinglePostStatistic(post);
+						
+			}).collect(Collectors.toList());
+		};
+	}
+	
+	@Test
+	public void handlingTheDownstream__changeTheReturnedListOfBlogPost_mapToAnObject() {
+		Map<Tuple, PostStatistic> result = blogPosts.stream()
+					.collect(Collectors.groupingBy(post -> new Tuple(post.getAuthor(), post.getType()), 
+								Collectors.collectingAndThen(Collectors.toList(), 
+										posts -> {
+											return posts.stream().map(post -> {
+												return postToSinglePostStatistic(post);
+											}).reduce(new PostStatistic(), (s1, s2) -> {
+												s1.setTotalLikes(s1.getTotalLikes() + s2.getTotalLikes());
+												return s1;
+											});
+										})
+					));
+		
+		Tuple saturnWithReviewTypeTuple = new Tuple("Saturn", BlogPostType.REVIEW);
+		assertThat(result.get(saturnWithReviewTypeTuple), Matchers.notNullValue());
+		assertThat(result.get(saturnWithReviewTypeTuple).getTotalLikes(), Matchers.equalTo(1140));
+	}
+
+	private PostStatistic postToSinglePostStatistic(BlogPost post) {
+		PostStatistic typeStatistic = new PostStatistic();
+		Map<String, Integer> authorStatistic = typeStatistic.getAuthorStatistic();
+		authorStatistic.putIfAbsent(post.getAuthor(), 0);
+		//typeStatistic.getAuthorStatistic().computeIfAbsent(post.getAuthor(), key -> 0);
+		int count = authorStatistic.computeIfPresent(post.getAuthor(), (key, value) -> value + 1);
+		// Notice, if we put value++, the count is still zero, // TODO: please check this behavior
+		authorStatistic.put(post.getAuthor(), count);
+		
+		Map<BlogPostType, Integer> blogTypeStatistic = typeStatistic.getTypeStatistic();
+		blogTypeStatistic.putIfAbsent(post.getType(), 0);
+		blogTypeStatistic.put(post.getType(), blogTypeStatistic.get(post.getType()) + 1);
+		typeStatistic.setTotalLikes(typeStatistic.getTotalLikes() + post.getLikes());
+		return typeStatistic;
+	}
+	
 }
